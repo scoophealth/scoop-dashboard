@@ -1,0 +1,27 @@
+{
+  "name": "Yaoft.",
+  "version": "0.0.0",
+  "description": "Yet Another Opinionated Front-end Template.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "assemble": "^0.4.37",
+    "grunt": "^0.4.5",
+    "grunt-casper": "^0.3.8",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-connect": "^0.7.1",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-imagemin": "^0.7.0",
+    "grunt-contrib-less": "^0.11.0",
+    "grunt-contrib-uglify": "^0.4.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-traceur": "^0.1.1",
+    "load-grunt-tasks": "^0.4.0"
+  },
+  "scripts": {
+    "start": "grunt develop",
+    "test": "grunt"
+  },
+  "author": "Lead/Simbioses Lab",
+  "license": "Apache 2.0"
+}
