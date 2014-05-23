@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/scoophealth/scoop-dashboard.png)](https://travis-ci.org/scoophealth/scoop-dashboard)
+
 # Prereqs
 
 * [Node](http://nodejs.org/) - This should provide `node` and `npm`.
