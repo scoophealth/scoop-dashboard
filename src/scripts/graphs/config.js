@@ -37,12 +37,21 @@ class Config {
         if (value < 0) { throw 'Height should be positive.'; }
         this.config.height = value;
     }
-    
+
+    get labels() {
+        return this.config.labels;
+    }
+    set labels(value) {
+        if (!value.x && !value.y) { throw 'Specify x and y labels. Null is allowed.'; }
+        this.config.labels = value;
+    }
+
 }
 
 var defaults = {
     element: '#graph',
     height: 500,
     width: 500,
-    data: [{ letter: 'A', value: 55 }, { letter: 'B', value: 10 }, { letter: 'C', value: 25 }]
+    labels: { x: 'Letter', y: 'Frequency' },
+    data: [{ letter: 'A', value: 0.55 }, { letter: 'B', value: 0.10 }, { letter: 'C', value: 0.25 }]
 };

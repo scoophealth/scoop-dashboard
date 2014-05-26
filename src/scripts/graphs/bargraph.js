@@ -19,49 +19,56 @@ class Bargraph extends Graph {
 
         var xAxis = d3.svg.axis()
             .scale(x)
-            .orient("bottom");
+            .orient('bottom');
 
         var yAxis = d3.svg.axis()
             .scale(y)
-            .orient("left")
-            .ticks(10, "%");
+            .orient('left')
+            .ticks(10, '%');
 
-        var svg = d3.select(this.config.element).append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        var svg = d3.select(this.config.element).append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+          .append('g')
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
         x.domain(this.config.data.map(function(d) { return d.letter; }));
-        y.domain([0, d3.max(this.config.data, function(d) { return d.value; })]);
+        y.domain([0, 1]);
 
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
+        svg.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + height + ')')
+            .call(xAxis)
+            .append('text')
+            .attr('y', 6)
+            .attr('x', width)
+            .attr('dy', '.71em')
+            .style('text-anchor', 'end')
+            .text(this.config.labels.x);
 
-        svg.append("g")
-            .attr("class", "y axis")
+        svg.append('g')
+            .attr('class', 'y axis')
             .call(yAxis)
-            .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .style("text-anchor", "end")
-            .text("Frequency");
+            .append('text')
+            .attr('transform', 'rotate(-90)')
+            .attr('y', 6)
+            .attr('dy', '.71em')
+            .style('text-anchor', 'end')
+            .text(this.config.labels.y);
 
-        svg.selectAll(".bar")
+        svg.selectAll('.bar')
             .data(this.config.data)
-            .enter().append("rect")
-            .attr("class", "bar")
-            .attr("x", function(d) { return x(d.letter); })
-            .attr("width", x.rangeBand())
-            .attr("y", function(d) { return y(d.value); })
-            .attr("height", function(d) { return height - y(d.value); });
+            .enter().append('rect')
+            .attr('class', 'bar')
+            .attr('x', function(d) { return x(d.letter); })
+            .attr('width', x.rangeBand())
+            .attr('y', function(d) { return y(d.value); })
+            .attr('height', function(d) { return height - y(d.value); });
 
         function type(d) {
-          d.value = +d.value;
-          return d;
+            // Coherce the value, just in case.
+            d.value = +d.value;
+            return d;
         }
     }
 
