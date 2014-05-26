@@ -12,9 +12,12 @@ module.exports = function (grunt) {
                 options: {
                     // No options.
                 },
-                files: {
-                    'build/min.js': ['src/scripts/**/*.es6.js']
-                }
+                files: [{
+                    expand: true,
+                    cwd: 'src/',
+                    src: ['scripts/**/*.js', '!scripts/lib/**/*.js'],
+                    dest: 'build/'
+                }]
             }
         },
         // LESS
@@ -32,10 +35,12 @@ module.exports = function (grunt) {
         // Uglify
         uglify: {
             build: {
-                files: {
-                    // Include assets first.
-                    'build/min.js': ['src/scripts/**/*.js', 'build/min.js', '!src/scripts/**/*.es6.js']
-                }
+                files: [{
+                    expand: true,
+                    cwd: 'src/',
+                    src: 'scripts/lib/**/*.js',
+                    dest: 'build/'
+                }]
             }
         },
         // Imagemin
