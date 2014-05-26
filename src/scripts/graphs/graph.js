@@ -12,7 +12,7 @@ class Graph {
 
     // (Re)draws the graph.
     draw() {}
-
+    remove() {}
 }
 
 var config = new Config();

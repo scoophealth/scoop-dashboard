@@ -37,10 +37,12 @@ class Config {
         if (value < 0) { throw 'Height should be positive.'; }
         this.config.height = value;
     }
+    
 }
 
 var defaults = {
     element: '#graph',
-    height: 55,
-    width: 55
+    height: 500,
+    width: 500,
+    data: [{ letter: 'A', value: 55 }, { letter: 'B', value: 10 }, { letter: 'C', value: 25 }]
 };

@@ -88,8 +88,8 @@ module.exports = function (grunt) {
                 }
             },
             scripts: {
-                files: ['src/scripts/**/*.js'],
-                tasks: ['scripts'],
+                files: ['src/scripts/**/*.js', 'src/scripts/lib/**/*.j'],
+                tasks: ['traceur'],
                 options: {
                     livereload: true
                 }
