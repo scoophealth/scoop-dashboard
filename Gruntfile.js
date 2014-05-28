@@ -19,8 +19,37 @@ module.exports = function (grunt) {
                     port: 8080,
                     livereload: true,
                     base: 'src',
-                    protocol: 'http'
-                }
+                    protocol: 'http',
+                    middleware: function (connect, options) {
+                        if (!Array.isArray(options.base)) {
+                            options.base = [options.base];
+                        }
+
+                        // Setup the proxy
+                        var middlewares = [require('grunt-connect-proxy/lib/utils').proxyRequest];
+
+                        // Serve static files.
+                        options.base.forEach(function (base) {
+                            middlewares.push(connect.static(base));
+                        });
+
+                        // Make directory browse-able.
+                        var directory = options.directory || options.base[options.base.length - 1];
+                        middlewares.push(connect.directory(directory));
+
+                        return middlewares;
+					}
+                },
+				proxies: [{
+					context: '/api/v1',
+					host: 'localhost',
+					port: 8081,
+					https: false,
+					changeOrigin: true,
+					headers: {
+						'is-mock': true
+					}
+				}]
             }
         },
         // Casper
@@ -32,8 +61,19 @@ module.exports = function (grunt) {
             tests: {
                 src: ['test/**/*.js']
             }
-        }
+        },
+		// Stubby
+		stubby: {
+			stubServer: {
+				options: {
+					stubs: 8081
+				},
+				files: [{
+					src: [ 'mocks/*.{json,yaml,js}' ]
+				}]
+			}
+		}
 	});
-	grunt.registerTask('serve', ['connect', 'watch']);
-	grunt.registerTask('test', ['connect', 'casper']);
+	grunt.registerTask('serve', ['stubby', 'configureProxies:server', 'connect', 'watch']);
+	grunt.registerTask('test', ['stubby', 'configureProxies:server', 'connect', 'casper']);
 };
