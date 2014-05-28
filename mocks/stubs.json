@@ -1,0 +1,16 @@
+[
+  {
+    "request": {
+      "url": "/queries",
+      "method": "GET"
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "latency": 100,
+      "file": "./mocks/resources/queries.json"
+    }
+  }
+]
