@@ -1,0 +1,3 @@
+function Visualizer() {
+	'use strict';
+}
