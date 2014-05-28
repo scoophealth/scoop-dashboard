@@ -37,7 +37,3 @@ grunt serve
 Then visit `localhost:8080` in Firefox or Chrome.
 This task will persist and watch for changed files, if you're using [LiveReload Extensions](http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-) it'll even reload your page for you.
 
-
-# Future Plans
-
-* Consider moving to `make` instead of `grunt`
