@@ -1,8 +1,8 @@
-function Sidebar(api) {
+function Sidebar() {
 	'use strict';
 	// Populate the sidebar.
 	this.populateFavouriteQueries = function () {
-		d3.json(api.favouriteQueries(), function (error, data) {
+		d3.json(document.api.favouriteQueries(), function (error, data) {
 			if (error) {
 				throw error;
 			}
@@ -46,6 +46,6 @@ function Sidebar(api) {
 		});
 	}
 	
-	// Finish up
+	// Initialize
 	this.populateFavouriteQueries();
 }

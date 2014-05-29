@@ -65,7 +65,7 @@ casper.test.begin('Sidebar queries have favourites', function suite(test) {
 casper.test.begin('Sidebar queries have a link for a full list.', function suite(test) {
 	casper.start(rootUri + '/dashboard.html');
 	casper.then(function () {
-		test.assertElementCount('#queries > li > a#queryList[href]', 5, 'Should have a paginator.');
+		test.assertExists('a#queryList[href]', 'Should have a link to a full list.');
 	});
 	casper.run(function () {
 		test.done();

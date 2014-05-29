@@ -63,17 +63,17 @@
 	<script src="js/Api.js"></script>
 	<script src="js/Sidebar.js"></script>
 	<script src="js/Vizualizer.js"></script>
+	<script src="js/Router.js"></script>
 	<script>
-		// Declare these now so they're accessible.
-		var api, sidebar, visualizer;
 		$(document).ready(function(){
 			// TODO: Handle URI Fragments and route accordingly.
 			// Start Foundation
 			$(document).foundation();
 			// Initialize Visualizer
-			api = new Api();
-			sidebar = new Sidebar(api);
-			visualier = new Visualizer(api);
+			document.api = new Api();
+			document.visualizer = new Visualizer();
+			document.sidebar = new Sidebar();
+			document.router = new Router();
 		});
 	</script>
 </body>

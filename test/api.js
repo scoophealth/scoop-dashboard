@@ -6,42 +6,42 @@ casper.test.begin('api.queries', function suite(test) {
 	casper.start(rootUri + '/dashboard.html');
 	casper.then(function() {
 		test.assertEvalEquals(function() {
-			return api.queries();
+			return document.api.queries();
 		}, '/api/v1/queries', 'No parameters.');
 	});
 	casper.then(function() {
 		test.assertEvalEquals(function() {
-			return api.queries({limit: 5});
+			return document.api.queries({limit: 5});
 		}, '/api/v1/queries?limit=5', 'Limit parameter.');
 	});
 	casper.then(function() {
 		test.assertEvalEquals(function() {
-			return api.queries({skip: 5});
+			return document.api.queries({skip: 5});
 		}, '/api/v1/queries?skip=5', 'Skip parameter.');
 	});
 	casper.then(function() {
 		test.assertEvalEquals(function() {
-			return api.queries({search: 'Bear'});
+			return document.api.queries({search: 'Bear'});
 		}, '/api/v1/queries?search=Bear', 'Search parameter.');
 	});
 	casper.then(function() {
 		test.assertEvalEquals(function() {
-			return api.queries({limit: 5, skip: 5});
+			return document.api.queries({limit: 5, skip: 5});
 		}, '/api/v1/queries?limit=5&skip=5', 'Limit & Skip parameter.');
 	});
 	casper.then(function() {
 		test.assertEvalEquals(function() {
-			return api.queries({limit: 5, search: 'Bear'});
+			return document.api.queries({limit: 5, search: 'Bear'});
 		}, '/api/v1/queries?limit=5&search=Bear', 'Limit & Search parameter.');
 	});
 	casper.then(function() {
 		test.assertEvalEquals(function() {
-			return api.queries({skip: 5, search: 'Bear'});
+			return document.api.queries({skip: 5, search: 'Bear'});
 		}, '/api/v1/queries?skip=5&search=Bear', 'Skip & Search parameter.');
 	});
 	casper.then(function() {
 		test.assertEvalEquals(function() {
-			return api.queries({limit: 5, skip: 5, search: 'Bear'});
+			return document.api.queries({limit: 5, skip: 5, search: 'Bear'});
 		}, '/api/v1/queries?limit=5&skip=5&search=Bear', 'Limit, Skip, & Search parameter.');
 	});
 	casper.run(function() {
