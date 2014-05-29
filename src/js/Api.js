@@ -7,10 +7,7 @@ function Api() {
 	this.queries = function (opts) {
 		var url = this.root + this.version + '/queries';
 		if (opts) {
-			url += '?';
-			url += (opts.limit)	  ? 'limit='   + opts.limit	  + '&' : '';
-			url += (opts.skip)	  ? 'skip='	   + opts.skip	  + '&' : '';
-			url += (opts.search)  ? 'search='  + opts.search  + '&' : '';
+			url += '?' + $.param(opts)
 		}
 		return url;
 	};

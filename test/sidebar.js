@@ -33,7 +33,7 @@ casper.test.begin('Sidebar queries have tooltips', function suite(test) {
 	casper.then(function () {
 		test.assertExists('#queries .has-tip', 'Queries have tooltips.');
 		test.assertExists('#queries .has-tip.tip-right', 'Queries have tooltips on the right.');
-		// Interaction
+		// Toggle the menu, otherwise it won't work.
 		casper.mouse.click('.left-off-canvas-toggle');
 		test.assertExists('.off-canvas-wrap.move-right', 'The sidebar is open.');
 		// Simulate a mouseover even. Casper's `mouse` module isn't capable of this.
