@@ -55,8 +55,7 @@ module.exports = function (grunt) {
 		// Casper
 		casper: {
 			options: {
-				test: true,
-				'fail-fast': true
+				test: true
 			},
 			tests: {
 				src: ['test/**/*.js']

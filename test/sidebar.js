@@ -18,10 +18,11 @@ casper.test.begin('Sidebar toggles', function suite(test) {
 	});
 });
 
-casper.test.begin('Sidebar populates queries', function suite(test) {
+casper.test.begin('Sidebar populates 5 queries', function suite(test) {
 	casper.start(rootUri + '/dashboard.html');
 	casper.then(function () {
 		test.assertElementCount('#queries > li', 5, 'Should populate queries.');
+		test.assertElementCount('#queries > li > a[href]', 5, 'Should have links.');
 	});
 	casper.run(function () {
 		test.done();
@@ -31,8 +32,8 @@ casper.test.begin('Sidebar populates queries', function suite(test) {
 casper.test.begin('Sidebar queries have tooltips', function suite(test) {
 	casper.start(rootUri + '/dashboard.html');
 	casper.then(function () {
-		test.assertExists('#queries .has-tip', 'Queries have tooltips.');
-		test.assertExists('#queries .has-tip.tip-right', 'Queries have tooltips on the right.');
+		test.assertExists('#queries .tip-right', 'Queries have tooltips.');
+		test.assertExists('#queries .tip-right', 'Queries have tooltips on the right.');
 		// Toggle the menu, otherwise it won't work.
 		casper.mouse.click('.left-off-canvas-toggle');
 		test.assertExists('.off-canvas-wrap.move-right', 'The sidebar is open.');
@@ -42,8 +43,19 @@ casper.test.begin('Sidebar queries have tooltips', function suite(test) {
 		});
 		// Wait for a short time.
 		casper.wait(200, function () {
-			test.assertExists('a.has-tip.open', 'Query tooltips open when you hover over them.');
+			test.assertExists('.tip-right.open', 'Query tooltips open when you hover over them.');
 		});
+	});
+	casper.run(function () {
+		test.done();
+	});
+});
+
+casper.test.begin('Sidebar queries have favourites', function suite(test) {
+	casper.start(rootUri + '/dashboard.html');
+	casper.then(function () {
+		test.assertElementCount('#queries > li > a.favdiv', 5, 'Should have favorites.');
+		test.assertElementCount('#queries > li > a > i', 5, 'Should have should have icons.');
 	});
 	casper.run(function () {
 		test.done();
