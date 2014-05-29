@@ -1,8 +1,8 @@
 function Sidebar(api) {
 	'use strict';
 	// Populate the sidebar.
-	this.populateQueries = function () {
-		d3.json(api.queries(), function (error, data) {
+	this.populateFavouriteQueries = function () {
+		d3.json(api.favouriteQueries(), function (error, data) {
 			if (error) {
 				throw error;
 			}
@@ -13,7 +13,7 @@ function Sidebar(api) {
 				.append('li')
 				.classed({ 'clearfix': true })
 				// Set Tooltips
-				.attr('data-tooltip', true)
+				.attr('data-tooltip', '')
 				.classed({ 'tip-right': true })
 				.attr('title', function (d) { return d.description; })
 				// Refresh the Tooltips
@@ -47,5 +47,5 @@ function Sidebar(api) {
 	}
 	
 	// Finish up
-	this.populateQueries();
+	this.populateFavouriteQueries();
 }

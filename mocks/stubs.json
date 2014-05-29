@@ -1,7 +1,7 @@
 [
   {
     "request": {
-      "url": "/queries",
+      "url": "/queries$",
       "method": "GET"
     },
     "response": {
@@ -11,6 +11,20 @@
       },
       "latency": 100,
       "file": "./mocks/resources/queries.json"
+    }
+  },
+  {
+    "request": {
+      "url": "/queries/favourites$",
+      "method": "GET"
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "latency": 100,
+      "file": "./mocks/resources/favourites.json"
     }
   }
 ]

@@ -2,43 +2,43 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
+	<meta charset="UTF-8">
 
-    <title>SCOOP Authentication</title>
-    <meta name="description" content="The SCOOP Visualization Dashboard.">
+	<title>SCOOP Authentication</title>
+	<meta name="description" content="The SCOOP Visualization Dashboard.">
 
-    <link rel="stylesheet" href="lib/foundation.min.css">
-    <link rel="stylesheet" href="css/auxilary.css">
+	<link rel="stylesheet" href="lib/foundation.min.css">
+	<link rel="stylesheet" href="css/auxilary.css">
 </head>
 
 <body style="height: 100%">
 
-    <div id="login-background" class="block" style="height: 100%">
-        <div class="centered">
-            <form class="panel radius" action="/api/v1/auth">
-                <h2>Login</h2>
-                <label>Username
-                    <input type="text" placeholder="Your supplied username.">
-                </label>
-                <label>Password
-                    <input type="password" placeholder="Your supplied password.">
-                </label>
-                <input class="button radius" type="submit" value="Log In">
-            </form>
-        </div>
-    </div>
+	<div id="login-background" class="block" style="height: 100%">
+		<div class="centered">
+			<form class="panel radius" action="/api/v1/auth">
+				<h2>Login</h2>
+				<label>Username
+					<input type="text" name="user" placeholder="Your supplied username.">
+				</label>
+				<label>Password
+					<input type="password" name="password" placeholder="Your supplied password.">
+				</label>
+				<input class="button radius" type="submit" value="Log In">
+			</form>
+		</div>
+	</div>
 
 
 
-    <script src="lib/jquery-2.1.1.min.js"></script>
-    <script src="lib/foundation.min.js"></script>
-    <script src="lib/d3.v3.min.js"></script>
+	<script src="lib/jquery-2.1.1.min.js"></script>
+	<script src="lib/foundation.min.js"></script>
+	<script src="lib/d3.v3.min.js"></script>
 
-    <!-- Visualizer stuff -->
-    <script>
-        // Start Foundation
-        $(document).foundation();
-    </script>
+	<!-- Visualizer stuff -->
+	<script>
+		// Start Foundation
+		$(document).foundation();
+	</script>
 </body>
 
 </html>

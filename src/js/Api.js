@@ -11,4 +11,18 @@ function Api() {
 		}
 		return url;
 	};
+	
+	// Returns a string used to query the API.
+	this.favouriteQueries = function (opts) {
+		var url = this.root + this.version + '/queries/favourites';
+		if (opts) {
+			url += '?' + $.param(opts)
+		}
+		return url;
+	};
+	
+	this.unfavoriteQuery = function (id) {
+		// TODO: Add favouriting functionality.
+		console.log("TODO");
+	}
 }

@@ -18,10 +18,10 @@ casper.test.begin('Sidebar toggles', function suite(test) {
 	});
 });
 
-casper.test.begin('Sidebar populates 5 queries', function suite(test) {
+casper.test.begin('Sidebar populates 5 favourite queries', function suite(test) {
 	casper.start(rootUri + '/dashboard.html');
 	casper.then(function () {
-		test.assertElementCount('#queries > li', 5, 'Should populate queries.');
+		test.assertElementCount('#queries > li', 5, 'Should populate favourite queries.');
 		test.assertElementCount('#queries > li > a[href]', 5, 'Should have links.');
 	});
 	casper.run(function () {
@@ -56,6 +56,16 @@ casper.test.begin('Sidebar queries have favourites', function suite(test) {
 	casper.then(function () {
 		test.assertElementCount('#queries > li > a.favdiv', 5, 'Should have favorites.');
 		test.assertElementCount('#queries > li > a > i', 5, 'Should have should have icons.');
+	});
+	casper.run(function () {
+		test.done();
+	});
+});
+
+casper.test.begin('Sidebar queries have a link for a full list.', function suite(test) {
+	casper.start(rootUri + '/dashboard.html');
+	casper.then(function () {
+		test.assertElementCount('#queries > li > a#queryList[href]', 5, 'Should have a paginator.');
 	});
 	casper.run(function () {
 		test.done();
