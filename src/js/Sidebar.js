@@ -13,12 +13,17 @@ function Sidebar(api) {
 			items.enter()
 				.append('li')
 				.append('a')
-				.text(function (d) {
-					if (d.title.length > limit) {
-						return d.title.substr(0, limit) + "...";
-					} else {
-						return d.title;
-					}
+				.text(function (d) { return d.title; })
+				.attr('data-tooltip', true)
+				.classed({ 'has-tip': true, 'tip-right': true })
+				.attr('title', function (d) { return d.description; })
+				.call(function() {
+					// Refresh the Tooltips
+					$(document).foundation('tooltip');
+				})
+				.call(function() {
+					// Notify progress.
+					d3.select('#title').text("Sidebar queries populated...");
 				});
 		});
 	}
