@@ -1,9 +1,23 @@
 // Tests the Api module. In general this won't actually call the API. It just builds URIs since we utilize d3's .json call.
 
-var rootUri = 'http://localhost:8080';
+var require = patchRequire(require);
+
+var rootUri = 'http://localhost:8080',
+	tools = require('./_tools');
+
+casper.test.begin('Setup authentication.', function suite(test) {
+	casper.start(rootUri, function() {
+		casper.capture('foo.png');
+		tools.login('foo', 'bar', function (success) {
+			test.assert(success, 'Authenticated.');
+		});
+	});
+	casper.run(function() {
+		test.done();
+	});
+});
 
 casper.test.begin('api.queries', function suite(test) {
-	casper.start(rootUri + '/dashboard.html');
 	casper.then(function() {
 		test.assertEvalEquals(function() {
 			return document.api.queries();

@@ -1,11 +1,24 @@
 // Tests the user interaction with the sidebar.
+var require = patchRequire(require);
 
-var rootUri = 'http://localhost:8080';
+var rootUri = 'http://localhost:8080',
+	tools = require('./_tools');
 
-casper.options.viewportSize = {width: 800, height: 600};
+casper.test.begin('Setup authentication.', function suite(test) {
+	casper.start(rootUri, function() {
+		tools.login('foo', 'bar', function (success) {
+			test.assert(success, 'Authenticated.');
+		});
+		casper.waitFor(function () {
+			return !casper.visible('#auth');
+		})
+	});
+	casper.run(function() {
+		test.done();
+	});
+});
 
 casper.test.begin('Sidebar toggles', function suite(test) {
-	casper.start(rootUri + '/dashboard.html');
 	casper.then(function () {
 		test.assertExists('.left-off-canvas-toggle', 'Sidebar toggle button exists.');
 		casper.mouse.click('.left-off-canvas-toggle');
@@ -19,7 +32,6 @@ casper.test.begin('Sidebar toggles', function suite(test) {
 });
 
 casper.test.begin('Sidebar populates 5 favourite queries', function suite(test) {
-	casper.start(rootUri + '/dashboard.html');
 	casper.then(function () {
 		test.assertElementCount('#queries > li', 5, 'Should populate favourite queries.');
 		test.assertElementCount('#queries > li > a[href]', 5, 'Should have links.');
@@ -30,7 +42,6 @@ casper.test.begin('Sidebar populates 5 favourite queries', function suite(test) 
 });
 
 casper.test.begin('Sidebar queries have tooltips', function suite(test) {
-	casper.start(rootUri + '/dashboard.html');
 	casper.then(function () {
 		test.assertExists('#queries .tip-right', 'Queries have tooltips.');
 		test.assertExists('#queries .tip-right', 'Queries have tooltips on the right.');
@@ -52,7 +63,6 @@ casper.test.begin('Sidebar queries have tooltips', function suite(test) {
 });
 
 casper.test.begin('Sidebar queries have favourites', function suite(test) {
-	casper.start(rootUri + '/dashboard.html');
 	casper.then(function () {
 		test.assertElementCount('#queries > li > a.favdiv', 5, 'Should have favorites.');
 		test.assertElementCount('#queries > li > a > i', 5, 'Should have should have icons.');
@@ -63,7 +73,6 @@ casper.test.begin('Sidebar queries have favourites', function suite(test) {
 });
 
 casper.test.begin('Sidebar queries have a link for a full list.', function suite(test) {
-	casper.start(rootUri + '/dashboard.html');
 	casper.then(function () {
 		test.assertExists('a#queryList[href]', 'Should have a link to a full list.');
 	});

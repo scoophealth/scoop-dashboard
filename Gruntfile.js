@@ -58,7 +58,7 @@ module.exports = function (grunt) {
 				test: true
 			},
 			tests: {
-				src: ['test/**/*.js']
+				src: ['test/**/*.js', '!test/**/_*.js']
 			}
 		},
 		// Stubby
