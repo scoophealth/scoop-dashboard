@@ -26,7 +26,7 @@ function Sidebar() {
 				.classed({ 'left': true })
 				.attr('style', 'width: 200px;')
 				// Set Link
-				.attr('href', function (d) { return '#' + 'query=' + d._id; })
+				.attr('href', function (d) { return '#' + '/query/' + d._id; })
 				// Set text.
 				.text(function (d) { return d.title; })
 				
@@ -34,15 +34,11 @@ function Sidebar() {
 			divElems.append('a')
 				.classed({ 'right': true, 'text-center': true, 'favdiv': true })
 				.attr('data-id', function (d) { return d._id; })
-				.on('click', function (d) { api.unfavoriteQuery(d._id); })
+				.on('click', function (d) { document.api.unfavoriteQuery(d._id); })
 				// Add hearts
 				.append('i')
 				.classed({ 'fi-heart': true })
-				.attr('style', 'color: ' + d3.rgb(255, 105, 180) + ';')
-				// Notify progress.
-				.call(function () {
-					d3.select('#title').text("Sidebar queries populated...");
-				});
+				.attr('style', 'color: ' + d3.rgb(255, 105, 180) + ';');
 		});
 	}
 	

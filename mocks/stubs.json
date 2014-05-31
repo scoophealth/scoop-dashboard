@@ -1,7 +1,7 @@
 [
 	{
 		"request": {
-			"url": "/queries$",
+			"url": "^/api/v1/queries$",
 			"method": "GET"
 		},
 		"response": {
@@ -9,13 +9,12 @@
 			"headers": {
 				"Content-Type": "application/json"
 			},
-			"latency": 100,
 			"file": "./mocks/resources/queries.json"
 		}
 	},
 	{
 		"request": {
-			"url": "/queries/favourites$",
+			"url": "^/api/v1/favourites/queries$",
 			"method": "GET"
 		},
 		"response": {
@@ -23,13 +22,12 @@
 			"headers": {
 				"Content-Type": "application/json"
 			},
-			"latency": 100,
 			"file": "./mocks/resources/favourites.json"
 		}
 	},
 	{
 		"request": {
-			"url": "/auth$",
+			"url": "^/api/v1/auth$",
 			"query": {
 				"identity": "^foo$",
 				"password": "^bar$"
@@ -41,13 +39,12 @@
 			"headers": {
 				"Content-Type": "application/json"
 			},
-			"latency": 100,
 			"body": "{}"
 		}
 	},
 	{
 		"request": {
-			"url": "/auth$",
+			"url": "^/api/v1/auth$",
 			"query": {
 				"identity": "(?!^foo$)",
 				"password": "(?!^bar$)"
@@ -59,7 +56,6 @@
 			"headers": {
 				"Content-Type": "application/json"
 			},
-			"latency": 100,
 			"body": "{}"
 		}
 	}

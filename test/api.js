@@ -7,7 +7,6 @@ var rootUri = 'http://localhost:8080',
 
 casper.test.begin('Setup authentication.', function suite(test) {
 	casper.start(rootUri, function() {
-		casper.capture('foo.png');
 		tools.login('foo', 'bar', function (success) {
 			test.assert(success, 'Authenticated.');
 		});

@@ -23,7 +23,7 @@ function Api() {
 	
 	// Returns a string used to query the API.
 	this.favouriteQueries = function (opts) {
-		var url = this.root + this.version + '/queries/favourites';
+		var url = this.root + this.version + '/favourites/queries';
 		if (opts) {
 			url += '?' + $.param(opts);
 		}

@@ -9,9 +9,6 @@ casper.test.begin('Setup authentication.', function suite(test) {
 		tools.login('foo', 'bar', function (success) {
 			test.assert(success, 'Authenticated.');
 		});
-		casper.waitFor(function () {
-			return !casper.visible('#auth');
-		})
 	});
 	casper.run(function() {
 		test.done();
