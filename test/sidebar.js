@@ -4,6 +4,8 @@ var require = patchRequire(require);
 var rootUri = 'http://localhost:8080',
 	tools = require('./_tools');
 
+casper.options.viewportSize = { width: 1920, height: 1080 }
+
 casper.test.begin('Setup authentication.', function suite(test) {
 	casper.start(rootUri, function() {
 		tools.login('foo', 'bar', function (success) {
@@ -72,6 +74,11 @@ casper.test.begin('Sidebar queries have favourites', function suite(test) {
 casper.test.begin('Sidebar queries have a link for a full list.', function suite(test) {
 	casper.then(function () {
 		test.assertExists('a#queryList[href]', 'Should have a link to a full list.');
+		casper.mouse.click('.left-off-canvas-toggle');
+		casper.mouse.click('a#queryList[href]');
+		test.assertEvalEquals(function () {
+			return window.location.hash;
+		}, '#/queries', 'Clicking directs the page.');
 	});
 	casper.run(function () {
 		test.done();
