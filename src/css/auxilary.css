@@ -1,31 +1,36 @@
 /* This parent can be any width and height */
 .block {
-  text-align: center;
+	text-align: center;
 }
  
 /* The ghost, nudged to maintain perfect centering */
 .block:before {
-  content: '';
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
-  margin-right: -0.25em; /* Adjusts for spacing */
+	content: '';
+	display: inline-block;
+	height: 100%;
+	vertical-align: middle;
+	margin-right: -0.25em; /* Adjusts for spacing */
 }
 
 /* The element to be centered, can
-   also be of any width and height */ 
+	 also be of any width and height */ 
 .centered {
-  display: inline-block;
-  vertical-align: middle;
-  width: 300px;
+	display: inline-block;
+	vertical-align: middle;
+	width: 300px;
 }
 
-#login-background {
-    background-image: url(/img/blackorchid.png);
-}
 
 .favdiv {
-	width: 50px;
-	height: 47.3125px;
+/*	width: 50px;*/
+	height: auto;
 }
 
+#main {
+	overflow: auto;
+	min-height: 100%;
+}
+
+#main .row:last-child {
+	padding-bottom: 60px;
+}
