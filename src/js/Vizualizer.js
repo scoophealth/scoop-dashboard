@@ -16,7 +16,7 @@ function Visualizer() {
 		// Make space for the listing.
 		main.append('div').attr('id', 'listing');
 		// Get the queries and display them in a nice list.
-		d3.json(document.api.queries(), function (data) {
+		d3.json(document.api.queries(), function displayQueries(data) {
 			// Add a row div
 			var queries = main.select('#listing').selectAll('div').data(data);
 			queries.enter()
@@ -36,7 +36,7 @@ function Visualizer() {
 					// Build buttons
 					d3.select(this).call(buildButton, 'fi-eye', 'View', '#/query/' + d._id);
 					d3.select(this).call(buildButton, 'fi-heart', 'Favourite', function () {
-						console.log("Favourite not implemented yet");
+						alert("Favourite not implemented yet");
 					});
 				});
 		});
@@ -45,6 +45,19 @@ function Visualizer() {
 	// Displays a single query.
 	this.queryById = function (id) {
 		this.clean();
+		d3.json(document.api.query(id), function displayQuery(data) {
+			// Set title.
+			title.text(data.title);
+			var container = main.append('div').classed('row', true)
+				.append('div')
+				.classed({ 'small-centered': true, 'small-11': true, 'columns': true });
+			// Set description.
+			container.append('p').attr('id', 'description').classed('panel', true)
+				.text(data.description);
+			container.append('div').attr('id', 'chart');
+			data.chart.bindto = '#chart';
+			var chart = c3.generate(data.chart);
+		});
 	};
 	
 	// Auxilary Methods

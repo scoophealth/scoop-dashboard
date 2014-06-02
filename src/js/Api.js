@@ -21,6 +21,15 @@ function Api() {
 		return url;
 	};
 	
+	this.query = function (id, opts) {
+		if (!id) { throw "An id must be provided."}
+		var url = this.root + this.version + '/query/' + id;
+		if (opts) {
+			url += '?' + $.param(opts);
+		}
+		return url;
+	}
+	
 	// Returns a string used to query the API.
 	this.favouriteQueries = function (opts) {
 		var url = this.root + this.version + '/favourites/queries';

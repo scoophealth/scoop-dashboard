@@ -3,7 +3,7 @@
 var rootUri = 'http://localhost:8080',
 	tools = require('./_tools');
 
-casper.options.viewportSize = { width: 1920, height: 1080 }
+casper.options.viewportSize = { width: 1920, height: 1080 };
 
 // Most of this suite uses the `login` method from `tools`.
 
