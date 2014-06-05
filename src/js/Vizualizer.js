@@ -1,14 +1,17 @@
+/** The Visualizer.
+ * This handles most of the 'main part' of the screen.
+ */
 function Visualizer() {
 	'use strict';
 	var main = d3.select('#main'),
 	title = d3.select('#title');
 	
-	// Cleans the entire visualizer section.
+	/** Cleans the entire visualizer section. */
 	this.clean = function () {
 		main.html('');
 	};
 	
-	// Displays a list of queries.
+	/** Displays a list of queries. */
 	this.queries = function () {
 		this.clean();
 		// Set the title correctly.
@@ -43,7 +46,9 @@ function Visualizer() {
 		});
 	};
 	
-	// Displays a single query.
+	/** Displays a single query.
+	 * @param {string} - The ID of the query.
+	 */
 	this.queryById = function (id) {
 		this.clean();
 		d3.json(document.api.query(id), function displayQuery(error, data) {

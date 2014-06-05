@@ -1,6 +1,9 @@
+/** The Sidebar.
+ * This handles the sidebar of the screen, it also may modify the `#title` if need be.
+ */
 function Sidebar() {
 	'use strict';
-	// Populate the sidebar.
+	/** Populate the sidebar. */
 	this.populateFavouriteQueries = function () {
 		d3.json(document.api.favouriteQueries(), function (error, data) {
 			if (error) {
@@ -42,6 +45,6 @@ function Sidebar() {
 		});
 	}
 	
-	// Initialize
+	/** Initialize */
 	this.populateFavouriteQueries();
 }
