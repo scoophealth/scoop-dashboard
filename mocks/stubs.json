@@ -110,5 +110,18 @@
 			},
 			"file": "./mocks/resources/query3.json"
 		}
+	},
+	{
+		"request": {
+			"url": "^/api/v1/query/4$",
+			"method": "GET"
+		},
+		"response": {
+			"status": 200,
+			"headers": {
+				"Content-Type": "application/json"
+			},
+			"file": "./mocks/resources/query4.json"
+		}
 	}
 ]

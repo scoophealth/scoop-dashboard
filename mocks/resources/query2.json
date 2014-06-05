@@ -5,6 +5,8 @@
 	"map": "...",
 	"filter": "...",
 	"reduce": "...",
+	"author": "hub user <hubuser.example.com>",
+	"date": "June 31st, 2012",
 	"chart": {
 		"data": {
 			"columns": [

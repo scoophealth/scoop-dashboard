@@ -16,7 +16,8 @@ function Visualizer() {
 		// Make space for the listing.
 		main.append('div').attr('id', 'listing');
 		// Get the queries and display them in a nice list.
-		d3.json(document.api.queries(), function displayQueries(data) {
+		d3.json(document.api.queries(), function displayQueries(error, data) {
+			if (error) { throw "Query failed to be requested."; }
 			// Add a row div
 			var queries = main.select('#listing').selectAll('div').data(data);
 			queries.enter()
@@ -45,22 +46,63 @@ function Visualizer() {
 	// Displays a single query.
 	this.queryById = function (id) {
 		this.clean();
-		d3.json(document.api.query(id), function displayQuery(data) {
+		d3.json(document.api.query(id), function displayQuery(error, data) {
+			if (error) { throw "Query failed to be requested."; }
 			// Set title.
 			title.text(data.title);
 			var container = main.append('div').classed('row', true)
 				.append('div')
 				.classed({ 'small-centered': true, 'small-11': true, 'columns': true });
-			// Set description.
-			container.append('p').attr('id', 'description').classed('panel', true)
-				.text(data.description);
+			
+			// Build the chart.
 			container.append('div').attr('id', 'chart');
 			data.chart.bindto = '#chart';
 			var chart = c3.generate(data.chart);
+			
+			// Set controls.
+			var controls = container.append('div').attr('id', 'controls').call(function (controls) {
+				buildControls(chart, controls, data);
+			});
+			
+			// Set description.
+			container.append('h4').text('Description:')
+			container.append('p').attr('id', 'description').classed('panel', true)
+				.text(data.description);
+			
+			// Some info
+			container.append('p').attr('id', 'details').call(function (details) {
+				// Author
+				details.append('b').text('Author: ')
+				details.append('span').attr('id', 'author')
+					.text(data.author);
+					
+				details.append('br')
+				// Date
+				details.append('b').text('Date: ')
+				details.append('span').attr('id', 'date')
+					.text(data.date);
+			})
 		});
 	};
 	
+	
 	// Auxilary Methods
+	
+	/** Generates the controls for a chart.
+	 * @param {Element} chart - The DOM element of the chart.
+	 * @param {Element} controls - The DOM element to append the controls too.
+	 * @param {Object} data - The original data. TODO: Might not be needed.
+	 */
+	function buildControls(chart, controls, data) {
+		return;
+	}
+	
+	/** Generates a button (actually an 'a') as a child of the selection.
+	 * @param {Element} selection - The DOM element to append to.
+	 * @param {string} icon - An icon selected from Foundation Icons.
+	 * @param {string} title - The text inside of the button.
+	 * @param {string|function} action - Either a link target or a function to be executed on click.
+	 */
 	function buildButton(selection, icon, title, action) {
 		var button = selection.append('a').classed({ 'button': true, 'small': true })
 			.call(function (button) {

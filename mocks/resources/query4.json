@@ -1,0 +1,32 @@
+{
+	"_id": "4",
+	"title": "Population Pyramid.",
+	"description": "The population of pyramids over time.",
+	"map": "...",
+	"filter": "...",
+	"reduce": "...",
+	"author": "hub user <hubuser.example.com>",
+	"date": "June 31st, 2012",
+	"chart": {
+		"data": {
+			"columns": [
+				["Male", 693, 554, 220, 434, 811, 427, 232, 105, 42, 24 ],
+				["Female", 640, 522, 318, 830, 1189, 612, 403, 222, 119, 57 ],
+				["Undifferentiated", 23, 34, 15, 19, 23, 13, 15, 10, 0, 0 ]
+			],
+			"type": "bar",
+			"colors": {
+				"Male": "blue",
+				"Female": "red",
+				"Undifferentiated": "green"
+			}
+		},
+		"axis": {
+			"rotated": true,
+			"x": {
+				"type": "category",
+				"categories": [ "0-9", "10-19", "20-29", "30-39", "40-49", "50-59", "60-69", "70-79", "80-89", "90+" ]
+			}
+		}
+	}
+}
