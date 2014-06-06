@@ -110,11 +110,13 @@ function Visualizer() {
 		
 		var colours = controls.append('div').attr('id', 'colours');
 		Object.keys(chart.data.colors()).forEach(function (key) {
-			colours.append('label').text(key)
-				.append('input').attr('type', 'color')
+			var label = colours.append('label').classed();
+			
+			label.append('input').attr('type', 'color')
 				.attr('data-column', key)
 				.property('value', chart.data.colors()[key])
 				.on('change', changeColumnColour);
+			label.append('span').text(' ' + key);
 		});
 	}
 	

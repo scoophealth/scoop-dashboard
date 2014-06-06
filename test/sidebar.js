@@ -4,7 +4,7 @@ var require = patchRequire(require);
 var rootUri = 'http://localhost:8080',
 	tools = require('./_tools');
 
-casper.options.viewportSize = { width: 1920, height: 1080 }
+casper.options.viewportSize = { width: 1920, height: 1080 };
 
 casper.test.begin('Setup authentication.', function suite(test) {
 	casper.start(rootUri, function() {
