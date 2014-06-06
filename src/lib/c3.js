@@ -4,7 +4,7 @@
     /*global define, module, exports, require */
 
     var c3 = {
-        version: "0.2.1"
+        version: "0.2.3"
     };
 
     var CLASS = {
@@ -129,8 +129,8 @@
 
         var __interaction_enabled = getConfig(['interaction', 'enabled'], true);
 
-        var __onenter = getConfig(['onenter'], function () {}),
-            __onleave = getConfig(['onleave'], function () {}),
+        var __onmouseover = getConfig(['onmouseover'], function () {}),
+            __onmouseout = getConfig(['onmouseout'], function () {}),
             __onresize = getConfig(['onresize'], function () {}),
             __onresized = getConfig(['onresized'], function () {});
 
@@ -161,8 +161,8 @@
             __data_selection_isselectable = getConfig(['data', 'selection', 'isselectable'], function () { return true; }),
             __data_selection_multiple = getConfig(['data', 'selection', 'multiple'], true),
             __data_onclick = getConfig(['data', 'onclick'], function () {}),
-            __data_onenter = getConfig(['data', 'onenter'], function () {}),
-            __data_onleave = getConfig(['data', 'onleave'], function () {}),
+            __data_onmouseover = getConfig(['data', 'onmouseover'], function () {}),
+            __data_onmouseout = getConfig(['data', 'onmouseout'], function () {}),
             __data_onselected = getConfig(['data', 'onselected'], function () {}),
             __data_onunselected = getConfig(['data', 'onunselected'], function () {}),
             __data_ondragstart = getConfig(['data', 'ondragstart'], function () {}),
@@ -286,6 +286,7 @@
 
         // tooltip - show when mouseover on each data
         var __tooltip_show = getConfig(['tooltip', 'show'], true),
+            __tooltip_grouped = getConfig(['tooltip', 'grouped'], true),
             __tooltip_format_title = getConfig(['tooltip', 'format', 'title']),
             __tooltip_format_name = getConfig(['tooltip', 'format', 'name']),
             __tooltip_format_value = getConfig(['tooltip', 'format', 'value']),
@@ -377,6 +378,7 @@
 
         var isLegendRight = __legend_position === 'right';
         var legendStep = 0, legendItemWidth = 0, legendItemHeight = 0, legendOpacityForHidden = 0.15;
+        var currentMaxTickWidth = 0;
 
         /*-- Define Functions --*/
 
@@ -950,11 +952,14 @@
         }
         function getMaxTickWidth(id) {
             var maxWidth = 0, axisClass = id === 'x' ? CLASS.axisX : id === 'y' ? CLASS.axisY : CLASS.axisY2;
-            d3.selectAll('.' + axisClass + ' .tick text').each(function () {
-                var box = this.getBoundingClientRect();
-                if (maxWidth < box.width) { maxWidth = box.width; }
-            });
-            return maxWidth < 0 ? 0 : maxWidth;
+            if (svg) {
+                svg.selectAll('.' + axisClass + ' .tick text').each(function () {
+                    var box = this.getBoundingClientRect();
+                    if (maxWidth < box.width) { maxWidth = box.width; }
+                });
+            }
+            currentMaxTickWidth = maxWidth <= 0 ? currentMaxTickWidth : maxWidth;
+            return currentMaxTickWidth;
         }
         function updateAxisLabels(withTransition) {
             var axisXLabel = main.select('.' + CLASS.axisX + ' .' + CLASS.axisXLabel),
@@ -1057,7 +1062,7 @@
             updated = updateAngle(d);
             value = updated ? updated.value : null;
             ratio = getArcRatio(updated);
-            if (! meetsArcLabelThreshold(ratio)) { return ""; }
+            if (! hasGaugeType(c3.data.targets) && ! meetsArcLabelThreshold(ratio)) { return ""; }
             format = getArcLabelFormat();
             return format ? format(value, ratio) : defaultArcValueFormat(value, ratio);
         }
@@ -1217,7 +1222,7 @@
                 yDomainMax = isValue(yMax) ? yMax : getYDomainMax(yTargets),
                 domainLength, padding, padding_top, padding_bottom,
                 center = axisId === 'y2' ? __axis_y2_center : __axis_y_center,
-                yDomainAbs, lengths, diff, ratio,
+                yDomainAbs, lengths, diff, ratio, isAllPositive, isAllNegative,
                 showHorizontalDataLabel = hasDataLabel() && __axis_rotated,
                 showVerticalDataLabel = hasDataLabel() && !__axis_rotated;
             if (yTargets.length === 0) { // use current domain if target of axisId is none
@@ -1226,8 +1231,12 @@
             if (yDomainMin === yDomainMax) {
                 yDomainMin < 0 ? yDomainMax = 0 : yDomainMin = 0;
             }
+            isAllPositive = yDomainMin >= 0 && yDomainMax >= 0;
+            isAllNegative = yDomainMin <= 0 && yDomainMax <= 0;
+
             domainLength = Math.abs(yDomainMax - yDomainMin);
-            padding = padding_top = padding_bottom = showHorizontalDataLabel ? 0 : domainLength * 0.1;
+            padding = padding_top = padding_bottom = domainLength * 0.1;
+
             if (center) {
                 yDomainAbs = Math.max(Math.abs(yDomainMin), Math.abs(yDomainMax));
                 yDomainMax = yDomainAbs - center;
@@ -1253,9 +1262,10 @@
                 padding_top = getAxisPadding(__axis_y2_padding, 'top', padding, domainLength);
                 padding_bottom = getAxisPadding(__axis_y2_padding, 'bottom', padding, domainLength);
             }
-            // Bar/Area chart with only positive values should be 0-based
-            if ((hasBarType(yTargets) || hasAreaType(yTargets)) && !hasNegativeValueInTargets(yTargets)) {
-                padding_bottom = yDomainMin;
+            // Bar/Area chart should be 0-based if all positive|negative
+            if (hasBarType(yTargets) || hasAreaType(yTargets)) {
+                if (isAllPositive) { padding_bottom = yDomainMin; }
+                if (isAllNegative) { padding_top = -yDomainMax; }
             }
             return [yDomainMin - padding_bottom, yDomainMax + padding_top];
         }
@@ -1316,6 +1326,7 @@
                 x.domain(domain ? domain : brush.empty() ? orgXDomain : brush.extent());
                 if (__zoom_enabled) { zoom.scale(x).updateScaleExtent(); }
             }
+            return x.domain();
         }
         function diffDomain(d) {
             return d[1] - d[0];
@@ -1454,7 +1465,7 @@
         function generateTargetX(rawX, id, index) {
             var x;
             if (isTimeSeries) {
-                x = rawX ? rawX instanceof Date ? rawX : parseDate(rawX) : parseDate(getXValue(id, index));
+                x = rawX ? parseDate(rawX) : parseDate(getXValue(id, index));
             }
             else if (isCustomX() && !isCategorized) {
                 x = isValue(rawX) ? +rawX : getXValue(id, index);
@@ -1488,7 +1499,9 @@
                 json.forEach(function (o) {
                     var new_row = [];
                     targetKeys.forEach(function (key) {
-                        new_row.push(o[key]);
+                        // convert undefined to null becuase undefined data will be removed in convertDataToTargets()
+                        var v = typeof o[key] === 'undefined' ? null : o[key];
+                        new_row.push(v);
                     });
                     new_rows.push(new_row);
                 });
@@ -1597,6 +1610,10 @@
                 i = 0;
                 t.values.forEach(function (v) {
                     v.index = i++;
+                });
+                // this needs to be sorted because its index and value.index is identical
+                c3.data.xs[t.id].sort(function (v1, v2) {
+                    return v1 - v2;
                 });
             });
 
@@ -1792,10 +1809,6 @@
 
         function initialOpacity(d) {
             return d.value !== null && withoutFadeIn[d.id] ? 1 : 0;
-        }
-        function initialOpacityForText(d) {
-            var targetOpacity = opacityForText(d);
-            return initialOpacity(d) * targetOpacity;
         }
         function opacityForCircle(d) {
             return isValue(d.value) ? isScatterType(d) ? 0.5 : 1 : 0;
@@ -2092,7 +2105,7 @@
                     y0 = scale(0), offset = y0;
                 targets.forEach(function (t) {
                     if (t.id === d.id || indices[t.id] !== indices[d.id]) { return; }
-                    if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value * d.value > 0) {
+                    if (targetIds.indexOf(t.id) < targetIds.indexOf(d.id) && t.values[i].value * d.value >= 0) {
                         offset += scale(t.values[i].value) - y0;
                     }
                 });
@@ -2272,10 +2285,14 @@
 
         function parseDate(date) {
             var parsedDate;
-            try {
-                parsedDate = date instanceof Date ? new Date(date) : d3.time.format(__data_x_format).parse(date);
-            } catch (e) {
-                window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
+            if (date instanceof Date) {
+                parsedDate = date;
+            } else {
+                try {
+                    parsedDate = typeof date === 'number' ? new Date(date) : d3.time.format(__data_x_format).parse(date);
+                } catch (e) {
+                    window.console.error("Failed to parse x '" + date + "' to Date with format " + __data_x_format);
+                }
             }
             return parsedDate;
         }
@@ -2562,22 +2579,24 @@
                 return getter(getPoints(d, i), d, this);
             };
         }
-        function getXForText(points, d) {
-            var padding;
+        function getXForText(points, d, textElement) {
+            var box = textElement.getBoundingClientRect(), xPos, padding;
             if (__axis_rotated) {
                 padding = isBarType(d) ? 4 : 6;
-                return points[2][1] + padding * (d.value < 0 ? -1 : 1);
+                xPos = points[2][1] + padding * (d.value < 0 ? -1 : 1);
             } else {
-                return points[0][0] + (points[2][0] - points[0][0]) / 2;
+                xPos = points[0][0] + (points[2][0] - points[0][0]) / 2;
             }
+            return xPos > width ? width - box.width : xPos;
         }
         function getYForText(points, d, textElement) {
-            var box = textElement.getBoundingClientRect();
+            var box = textElement.getBoundingClientRect(), yPos;
             if (__axis_rotated) {
-                return (points[0][0] + points[2][0] + box.height * 0.6) / 2;
+                yPos = (points[0][0] + points[2][0] + box.height * 0.6) / 2;
             } else {
-                return points[2][1] + (d.value < 0 ? box.height : isBarType(d) ? -3 : -6);
+                yPos = points[2][1] + (d.value < 0 ? box.height : isBarType(d) ? -3 : -6);
             }
+            return yPos < box.height ? box.height : yPos;
         }
 
         function generateGetAreaPoint(areaIndices, isSub) { // partial duplication of generateGetBarPoints
@@ -2731,22 +2750,26 @@
             return __axis_rotated ? this.y(scale) : this.x(scale);
         };
 
-        if (__zoom_enabled) {
-            zoom = d3.behavior.zoom()
-                .on("zoomstart", function () { zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; })
-                .on("zoom", __zoom_enabled ? redrawForZoom : null);
-            zoom.scale = function (scale) {
-                return __axis_rotated ? this.y(scale) : this.x(scale);
-            };
-            zoom.orgScaleExtent = function () {
-                var extent = __zoom_extent ? __zoom_extent : [1, 10];
-                return [extent[0], Math.max(getMaxDataCount() / extent[1], extent[1])];
-            };
-            zoom.updateScaleExtent = function () {
-                var ratio = diffDomain(x.orgDomain()) / diffDomain(orgXDomain), extent = this.orgScaleExtent();
-                this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
-                return this;
-            };
+        zoom = d3.behavior.zoom()
+            .on("zoomstart", function () { zoom.altDomain = d3.event.sourceEvent.altKey ? x.orgDomain() : null; })
+            .on("zoom", redrawForZoom);
+        zoom.scale = function (scale) {
+            return __axis_rotated ? this.y(scale) : this.x(scale);
+        };
+        zoom.orgScaleExtent = function () {
+            var extent = __zoom_extent ? __zoom_extent : [1, 10];
+            return [extent[0], Math.max(getMaxDataCount() / extent[1], extent[1])];
+        };
+        zoom.updateScaleExtent = function () {
+            var ratio = diffDomain(x.orgDomain()) / diffDomain(orgXDomain), extent = this.orgScaleExtent();
+            this.scaleExtent([extent[0] * ratio, extent[1] * ratio]);
+            return this;
+        };
+
+        function updateZoom() {
+            var z = __zoom_enabled ? zoom : function () {};
+            main.select('.' + CLASS.zoomRect).call(z);
+            main.selectAll('.' + CLASS.eventRect).call(z);
         }
 
         /*-- Draw Chart --*/
@@ -2841,8 +2864,8 @@
             // Define svgs
             svg = selectChart.append("svg")
                 .style("overflow", "hidden")
-                .on('mouseenter', __onenter)
-                .on('mouseleave', __onleave);
+                .on('mouseenter', __onmouseover)
+                .on('mouseleave', __onmouseout);
 
             // Define defs
             defs = svg.append("defs");
@@ -2922,8 +2945,7 @@
             // Cover whole with rects for events
             eventRect = main.select('.' + CLASS.chart).append("g")
                 .attr("class", CLASS.eventRects)
-                .style('fill-opacity', 0)
-                .style('cursor', __zoom_enabled ? __axis_rotated ? 'ns-resize' : 'ew-resize' : null);
+                .style('fill-opacity', 0);
 
             // Define g for bar chart area
             main.select('.' + CLASS.chart).append("g")
@@ -2977,16 +2999,14 @@
             main.select('.' + CLASS.chart).append("g")
                 .attr("class", CLASS.chartTexts);
 
-            if (__zoom_enabled) { // TODO: __zoom_privileged here?
-                // if zoom privileged, insert rect to forefront
-                main.insert('rect', __zoom_privileged ? null : 'g.' + CLASS.grid)
-                    .attr('class', CLASS.zoomRect)
-                    .attr('width', width)
-                    .attr('height', height)
-                    .style('opacity', 0)
-                    .style('cursor', __axis_rotated ? 'ns-resize' : 'ew-resize')
-                    .call(zoom).on("dblclick.zoom", null);
-            }
+            // if zoom privileged, insert rect to forefront
+            main.insert('rect', __zoom_privileged ? null : 'g.' + CLASS.grid)
+                .attr('class', CLASS.zoomRect)
+                .attr('width', width)
+                .attr('height', height)
+                .style('opacity', 0)
+                .style('cursor', __axis_rotated ? 'ns-resize' : 'ew-resize')
+                .on("dblclick.zoom", null);
 
             // Set default extent if defined
             if (__axis_x_default) {
@@ -3122,13 +3142,13 @@
                     });
                     selectedData = newData.concat(selectedData); // Add remained
 
-                    // Expand shapes if needed
+                    // Expand shapes for selection
                     if (__point_focus_expand_enabled) { expandCircles(index); }
                     expandBars(index);
 
                     // Call event handler
                     main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                        __data_onenter(d);
+                        __data_onmouseover(d);
                     });
                 })
                 .on('mouseout', function (d) {
@@ -3141,11 +3161,11 @@
                     unexpandBars();
                     // Call event handler
                     main.selectAll('.' + CLASS.shape + '-' + index).each(function (d) {
-                        __data_onleave(d);
+                        __data_onmouseout(d);
                     });
                 })
                 .on('mousemove', function (d) {
-                    var selectedData, index = d.index;
+                    var selectedData, index = d.index, eventRect = svg.select('.' + CLASS.eventRect + '-' + index);
 
                     if (dragging) { return; } // do nothing when dragging
                     if (hasArcType(c3.data.targets)) { return; }
@@ -3154,20 +3174,30 @@
                     selectedData = filterTargetsToShow(c3.data.targets).map(function (t) {
                         return addName(getValueOnIndex(t.values, index));
                     });
-                    showTooltip(selectedData, d3.mouse(this));
 
-                    // Show xgrid focus line
-                    showXGridFocus(selectedData);
+                    if (__tooltip_grouped) {
+                        showTooltip(selectedData, d3.mouse(this));
+                        showXGridFocus(selectedData);
+                    }
 
-                    if (! __data_selection_enabled) { return; }
-                    if (__data_selection_grouped) { return; } // nothing to do when grouped
+                    if (__tooltip_grouped && (!__data_selection_enabled || __data_selection_grouped)) {
+                        return;
+                    }
 
                     main.selectAll('.' + CLASS.shape + '-' + index)
-                        .filter(function (d) { return __data_selection_isselectable(d); })
                         .each(function () {
-                            var _this = d3.select(this).classed(CLASS.EXPANDED, true);
-                            if (this.nodeName === 'circle') { _this.attr('r', pointExpandedR); }
-                            svg.select('.' + CLASS.eventRect + '-' + index).style('cursor', null);
+                            d3.select(this).classed(CLASS.EXPANDED, true);
+                            if (__data_selection_enabled) {
+                                eventRect.style('cursor', __data_selection_grouped ? 'pointer' : null);
+                            }
+                            if (!__tooltip_grouped) {
+                                hideXGridFocus();
+                                hideTooltip();
+                                if (!__data_selection_grouped) {
+                                    unexpandCircles(index);
+                                    unexpandBars();
+                                }
+                            }
                         })
                         .filter(function (d) {
                             if (this.nodeName === 'circle') {
@@ -3177,13 +3207,16 @@
                                 return isWithinBar(this);
                             }
                         })
-                        .each(function () {
-                            var _this = d3.select(this);
-                            if (! _this.classed(CLASS.EXPANDED)) {
-                                _this.classed(CLASS.EXPANDED, true);
-                                if (this.nodeName === 'circle') { _this.attr('r', pointSelectR); }
+                        .each(function (d) {
+                            if (__data_selection_enabled && (__data_selection_grouped || __data_selection_isselectable(d))) {
+                                eventRect.style('cursor', 'pointer');
                             }
-                            svg.select('.' + CLASS.eventRect + '-' + index).style('cursor', 'pointer');
+                            if (!__tooltip_grouped) {
+                                showTooltip([d], d3.mouse(this));
+                                showXGridFocus([d]);
+                                if (__point_focus_expand_enabled) { expandCircles(index, d.id); }
+                                expandBars(index, d.id);
+                            }
                         });
                 })
                 .on('click', function (d) {
@@ -3201,7 +3234,7 @@
                         .on('dragstart', function () { dragstart(d3.mouse(this)); })
                         .on('dragend', function () { dragend(); })
                 )
-                .call(zoom).on("dblclick.zoom", null);
+                .on("dblclick.zoom", null);
         }
 
         function generateEventRectsForMultipleXs(eventRectEnter) {
@@ -3254,12 +3287,12 @@
                     if (dist(closest, mouse) < 100) {
                         svg.select('.' + CLASS.eventRect).style('cursor', 'pointer');
                         if (!mouseover) {
-                            __data_onenter(closest);
+                            __data_onmouseover(closest);
                             mouseover = true;
                         }
                     } else {
                         svg.select('.' + CLASS.eventRect).style('cursor', null);
-                        __data_onleave(closest);
+                        __data_onmouseout(closest);
                         mouseover = false;
                     }
                 })
@@ -3287,7 +3320,7 @@
                         .on('dragstart', function () { dragstart(d3.mouse(this)); })
                         .on('dragend', function () { dragend(); })
                 )
-                .call(zoom).on("dblclick.zoom", null);
+                .on("dblclick.zoom", null);
         }
 
         function toggleShape(that, d, i) {
@@ -3587,7 +3620,7 @@
                 .data(__grid_x_lines);
             // enter
             xgridLine = xgridLines.enter().append('g')
-                .attr("class", function (d) { return CLASS.xgridLine + (d['class'] ? ' ' + d['class'] : ''); });
+                .attr("class", function (d) { return CLASS.xgridLine + (d.class ? ' ' + d.class : ''); });
             xgridLine.append('line')
                 .style("opacity", 0);
             xgridLine.append('text')
@@ -3620,7 +3653,7 @@
                     .data(__grid_y_lines);
                 // enter
                 ygridLine = ygridLines.enter().append('g')
-                    .attr("class", function (d) { return CLASS.ygridLine + (d.class ? d.class : ''); });
+                    .attr("class", function (d) { return CLASS.ygridLine + (d.class ? ' ' + d.class : ''); });
                 ygridLine.append('line')
                     .style("opacity", 0);
                 ygridLine.append('text')
@@ -3720,8 +3753,7 @@
                     .style("fill", color)
                     .style("fill-opacity", 0);
                 mainText
-                    .text(function (d) { return formatByAxisId(getAxisId(d.id))(d.value, d.id); })
-                    .style("fill-opacity", initialOpacityForText);
+                    .text(function (d) { return formatByAxisId(getAxisId(d.id))(d.value, d.id); });
                 mainText.exit()
                   .transition().duration(durationForExit)
                     .style('fill-opacity', 0)
@@ -3903,7 +3935,8 @@
 
             if (__interaction_enabled) {
                 // rect for mouseover
-                eventRect = main.select('.' + CLASS.eventRects);
+                eventRect = main.select('.' + CLASS.eventRects)
+                    .style('cursor', __zoom_enabled ? __axis_rotated ? 'ns-resize' : 'ew-resize' : null);
                 if (notEmpty(__data_xs) && !isSingleX(__data_xs)) {
 
                     if (!eventRect.classed(CLASS.eventRectsMultiple)) {
@@ -3931,8 +3964,9 @@
 
                     if ((isCustomX() || isTimeSeries) && !isCategorized) {
                         rectW = function (d) {
-                            var prevX = getPrevX(d.index), nextX = getNextX(d.index), dx = c3.data.xs[d.id][d.index];
-                            return (x(nextX ? nextX : dx) - x(prevX ? prevX : dx)) / 2;
+                            var prevX = getPrevX(d.index), nextX = getNextX(d.index), dx = c3.data.xs[d.id][d.index],
+                                w = (x(nextX ? nextX : dx) - x(prevX ? prevX : dx)) / 2;
+                            return w < 0 ? 0 : w;
                         };
                         rectX = function (d) {
                             var prevX = getPrevX(d.index), dx = c3.data.xs[d.id][d.index];
@@ -3991,7 +4025,7 @@
                     .attr('x', xForText)
                     .attr('y', yForText)
                     .style("fill", color)
-                    .style("fill-opacity", opacityForText));
+                    .style("fill-opacity", options.flow ? 0 : opacityForText));
                 waitForDraw.add(mainRegion.selectAll('rect').transition()
                     .attr("x", regionX)
                     .attr("y", regionY)
@@ -4016,9 +4050,9 @@
                     flowLength = options.flow.length,
                     flowStart = getValueOnIndex(c3.data.targets[0].values, flowIndex),
                     flowEnd = getValueOnIndex(c3.data.targets[0].values, flowIndex + flowLength),
-                    orgDomain = x.domain(),
+                    orgDomain = x.domain(), domain,
                     durationForFlow = options.flow.duration || duration,
-                    onend = options.flow.onend || function () {},
+                    done = options.flow.done || function () {},
                     wait = generateWait();
 
                 // remove head data after rendered
@@ -4027,26 +4061,33 @@
                 });
 
                 // update x domain to generate axis elements for flow
-                updateXDomain(targetsToShow, true, true);
+                domain = updateXDomain(targetsToShow, true, true);
                 // update elements related to x scale
                 if (flushXGrid) { flushXGrid(true); }
 
                 // generate transform to flow
                 if (!options.flow.orgDataCount) { // if empty
-                    if (isTimeSeries || c3.data.targets[0].values.length !== 1) {
-                        flowStart = getValueOnIndex(c3.data.targets[0].values, 0);
-                        flowEnd = getValueOnIndex(c3.data.targets[0].values, c3.data.targets[0].values.length - 1);
-                        translateX = x(flowStart.x) - x(flowEnd.x);
+                    if (c3.data.targets[0].values.length !== 1) {
+                        translateX = x(orgDomain[0]) - x(domain[0]);
                     } else {
-                        translateX = x(-0.5) - x(0);
+                        if (isTimeSeries) {
+                            flowStart = getValueOnIndex(c3.data.targets[0].values, 0);
+                            flowEnd = getValueOnIndex(c3.data.targets[0].values, c3.data.targets[0].values.length - 1);
+                            translateX = x(flowStart.x) - x(flowEnd.x);
+                        } else {
+                            translateX = diffDomain(domain) / 2;
+                        }
                     }
                 } else if (options.flow.orgDataCount === 1 || flowStart.x === flowEnd.x) {
-                    translateX = x(orgDomain[0]) - x(flowEnd.x);
+                    translateX = x(orgDomain[0]) - x(domain[0]);
                 } else {
-                    // TODO: fix 0.9, I don't know why 0.9..
-                    translateX = (x(flowStart.x) - x(flowEnd.x)) * (isTimeSeries ? 0.9 : 1);
+                    if (isTimeSeries) {
+                        translateX = (x(orgDomain[0]) - x(domain[0]));
+                    } else {
+                        translateX = (x(flowStart.x) - x(flowEnd.x));
+                    }
                 }
-                scaleX = (diffDomain(orgDomain) / diffDomain(x.domain()));
+                scaleX = (diffDomain(orgDomain) / diffDomain(domain));
                 transform = 'translate(' + translateX + ',0) scale(' + scaleX + ',1)';
 
                 d3.transition().ease('linear').duration(durationForFlow).each(function () {
@@ -4104,7 +4145,8 @@
                     mainText
                         .attr('transform', null)
                         .attr('x', xForText)
-                        .attr('y', yForText);
+                        .attr('y', yForText)
+                        .style('fill-opacity', opacityForText);
                     mainRegion
                         .attr('transform', null);
                     mainRegion.select('rect').filter(isRegionOnX)
@@ -4117,7 +4159,7 @@
                         .attr("height", __axis_rotated ? rectW : height);
 
                     // callback for end of flow
-                    onend();
+                    done();
                 });
             } : null);
 
@@ -4125,6 +4167,8 @@
             mapToIds(c3.data.targets).forEach(function (id) {
                 withoutFadeIn[id] = true;
             });
+
+            updateZoom();
         }
         function redrawForBrush() {
             redraw({
@@ -4135,6 +4179,9 @@
             });
         }
         function redrawForZoom() {
+            if (!__zoom_enabled) {
+                return;
+            }
             if (filterTargetsToShow(c3.data.targets).length === 0) {
                 return;
             }
@@ -4655,15 +4702,20 @@
         function isArc(d) {
             return 'data' in d && hasTarget(c3.data.targets, d.data.id);
         }
-        function getGridFilter(params) {
-            params = params || {};
-            return function (line) {
-                return !(('value' in params && line.value === params.value) || ('class' in params && line.class === params.class));
-            };
+        function getGridFilterToRemove(params) {
+            return params ? function (line) {
+                var found = false;
+                [].concat(params).forEach(function (param) {
+                    if ((('value' in param && line.value === params.value) || ('class' in param && line.class === params.class))) {
+                        found = true;
+                    }
+                });
+                return found;
+            } : function () { return true; };
         }
         function removeGridLines(params, forX) {
-            var toShow = getGridFilter(params),
-                toRemove = function (line) { return !toShow(line); },
+            var toRemove = getGridFilterToRemove(params),
+                toShow = function (line) { return !toRemove(line); },
                 classLines = forX ? CLASS.xgridLines : CLASS.ygridLines,
                 classLine = forX ? CLASS.xgridLine : CLASS.ygridLine;
             main.select('.' + classLines).selectAll('.' + classLine).filter(toRemove)
@@ -4769,6 +4821,12 @@
         c3.unzoom = function () {
             brush.clear().update();
             redraw({withUpdateXDomain: true});
+        };
+        c3.zoom = function () {
+        };
+        c3.zoom.enable = function (enabled) {
+            __zoom_enabled = enabled;
+            updateAndRedraw();
         };
 
         c3.load = function (args) {
@@ -4927,7 +4985,7 @@
                     index: baseValue.index,
                     length: length,
                     duration: isValue(args.duration) ? args.duration : __transition_duration,
-                    onend: args.onend,
+                    done: args.done,
                     orgDataCount: orgDataCount,
                 },
                 withLegend: true,
@@ -5086,7 +5144,7 @@
             Object.keys(colors).forEach(function (id) {
                 __data_colors[id] = colors[id];
             });
-            redraw({withLegend: true});
+            redraw({withLegend: true, withUpdateXDomain: true});
             return __data_colors;
         };
 

@@ -34,6 +34,7 @@ casper.test.begin('/#/queries', function suite(test) {
 casper.test.begin('/#/query/1', function suite(test) {
 	casper.evaluate(function () {
 		window.location.hash = '#/query/1';
+		casper.wait(100); // It can take a bit for things to load.
 	});
 	casper.then(function () {
 		test.assertExists('#chart', 'Place for chart.');

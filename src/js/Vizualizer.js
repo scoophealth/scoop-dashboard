@@ -66,7 +66,7 @@ function Visualizer() {
 			
 			// Set controls.
 			var controls = container.append('div').attr('id', 'controls').call(function (controls) {
-				buildControls(chart, controls, data);
+				buildControls(chart, controls);
 			});
 			
 			// Set description.
@@ -94,12 +94,28 @@ function Visualizer() {
 	// Auxilary Methods
 	
 	/** Generates the controls for a chart.
-	 * @param {Element} chart - The DOM element of the chart.
+	 * @param {Object} chart - The C3 object of the Chart.
 	 * @param {Element} controls - The DOM element to append the controls too.
-	 * @param {Object} data - The original data. TODO: Might not be needed.
 	 */
-	function buildControls(chart, controls, data) {
-		return;
+	function buildControls(chart, controls) {
+		document.chart = chart;
+		var defaults = $.extend({}, chart.data.colors()),
+			changeColumnColour = function () {
+				var column = $(this).data('column'),
+					colour = $(this).val(),
+					current = chart.data.colors();
+				current[column] = colour;
+				chart.data.colors(current);
+			}; // We use this to apply the function in the event calls.
+		
+		var colours = controls.append('div').attr('id', 'colours');
+		Object.keys(chart.data.colors()).forEach(function (key) {
+			colours.append('label').text(key)
+				.append('input').attr('type', 'color')
+				.attr('data-column', key)
+				.property('value', chart.data.colors()[key])
+				.on('change', changeColumnColour);
+		});
 	}
 	
 	/** Generates a button (actually an 'a') as a child of the selection.
