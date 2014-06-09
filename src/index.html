@@ -113,7 +113,9 @@
 				document.api.auth(opts)
 					.done(function() {
 						console.log("Auth successful!");
-						window.location.hash = '/';
+						if (window.location.hash === "") {
+							window.location.hash = '/';
+						}
 						// Auth Successful
 						document.visualizer = new Visualizer();
 						document.sidebar = new Sidebar();

@@ -58,43 +58,57 @@ function Visualizer() {
 	this.queryById = function (id) {
 		this.clean();
 		d3.json(document.api.query(id), function displayQuery(error, data) {
-			if (error) { throw "Query failed to be requested."; }
-			
+			if (error) { throw error; }
 			main.append('h1').text(data.title);
-			
 			var row = main.append('div').classed('row', true)
 				.append('div')
-				.classed({ 'small-centered': true, 'small-11': true, 'columns': true });
-			
 			// Build the chart.
 			row.append('div').classed({ 'panel': true, 'panel-default': true })
 				.append('div').attr('id', 'chart');
 			data.chart.bindto = '#chart';
 			var chart = c3.generate(data.chart);
 			
-			// Set controls.
-			var controls = row.append('div').attr('id', 'controls').call(function (controls) {
-				buildControls(chart, controls);
+			// TODO
+			document.chart = chart;
+			console.log(chart);
+			// TODO
+			
+			// Set tabs.
+			var tabControls = row.append('ul').classed({ 'nav': true, 'nav-tabs': true, 'nav-justified': true }).call(function (list) {
+				list.append('li').classed('active', true).append('a')
+					.attr('href', '#info')
+					.attr('data-toggle', 'tab')
+					.text('Info');
+				list.append('li').append('a')
+					.attr('href', '#controls')
+					.attr('data-toggle', 'tab')
+					.text('Customize');
+			});
+			var tabContent = row.append('div').classed({ 'tab-content': true });
+			// Info
+			var info = tabContent.append('div').classed({ 'tab-pane': true, 'fade': true, 'active': true, 'in': true }).attr('id', 'info').call(function (info) {
+				// Set description.
+				info.append('h4').text('Description:')
+				info.append('p').attr('id', 'description').classed('panel', true)
+					.text(data.description);
+				// Some info
+				info.append('p').attr('id', 'details').call(function (details) {
+					// Author
+					details.append('b').text('Author: ')
+					details.append('span').attr('id', 'author')
+						.text(data.author);
+					details.append('br')
+					// Date
+					details.append('b').text('Date: ')
+					details.append('span').attr('id', 'date')
+						.text(data.date);
+				})
 			});
 			
-			// Set description.
-			row.append('h4').text('Description:')
-			row.append('p').attr('id', 'description').classed('panel', true)
-				.text(data.description);
-			
-			// Some info
-			row.append('p').attr('id', 'details').call(function (details) {
-				// Author
-				details.append('b').text('Author: ')
-				details.append('span').attr('id', 'author')
-					.text(data.author);
-					
-				details.append('br')
-				// Date
-				details.append('b').text('Date: ')
-				details.append('span').attr('id', 'date')
-					.text(data.date);
-			})
+			// Controls
+			var controls = tabContent.append('form').classed({ 'tab-pane': true, 'fade': true, 'form-horizontal': true }).attr('id', 'controls').call(function (controls) {
+				buildControls(chart, controls);
+			});
 		});
 	};
 	
@@ -107,6 +121,7 @@ function Visualizer() {
 	 */
 	function buildControls(chart, controls) {
 		var columns = _.pluck(chart.data.targets, 'id');
+		// Colours
 		function changeColumnColour() {
 			var column = $(this).data('column'),
 				colour = $(this).val(),
@@ -116,13 +131,17 @@ function Visualizer() {
 		}
 		var colours = controls.append('div').attr('id', 'colours');
 		columns.forEach(function (key) {
-			var label = colours.append('label').classed();
-			label.append('input').attr('type', 'color')
+			var group = controls.append('div').classed({ 'form-group': true, 'col-xs-2': true });
+			var label = group.append('label')
+			label.append('span').text(' ' + key);
+			group.append('input')
+				.classed('form-control', true)
+				.attr('type', 'color')
 				.attr('data-column', key)
 				.property('value', chart.data.colors()[key])
 				.on('change', changeColumnColour);
-			label.append('span').text(' ' + key);
 		});
+		// 
 	}
 	
 	/** Generates a button (actually an 'a') as a child of the selection.
