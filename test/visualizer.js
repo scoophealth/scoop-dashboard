@@ -21,7 +21,7 @@ casper.test.begin('/#/queries', function suite(test) {
 	casper.evaluate(function () {
 		window.location.hash = '#/queries';
 	});
-	casper.then(function () {
+	casper.waitForSelector('#listing', function () {
 		test.assertExists('#listing', 'Listing exists.');
 		test.assertExists('#listing > div', 'Items are in the listing.');
 		test.assertExists('#listing > div .btn[href]', 'Buttons are populated.');
