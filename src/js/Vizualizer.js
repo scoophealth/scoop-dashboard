@@ -3,43 +3,49 @@
  */
 function Visualizer() {
 	'use strict';
-	var main = d3.select('#main'),
-	title = d3.select('#title');
+	var main = d3.select('#main');
 	
 	/** Cleans the entire visualizer section. */
 	this.clean = function () {
 		main.html('');
 	};
 	
+	this.home = function () {
+		this.clean();
+		main.append('p').text('Successfully logged');
+	}
+	
 	/** Displays a list of queries. */
 	this.queries = function () {
 		this.clean();
 		// Set the title correctly.
-		title.text('Query List');
+		main.append('h1').text('Query List');
 		// Make space for the listing.
-		main.append('div').attr('id', 'listing');
 		// Get the queries and display them in a nice list.
 		d3.json(document.api.queries(), function displayQueries(error, data) {
 			if (error) { throw "Query failed to be requested."; }
 			// Add a row div
-			var queries = main.select('#listing').selectAll('div').data(data);
+			var queries = main.append('div').attr('id', 'listing')
+				.selectAll('div').data(data);
 			queries.enter()
 				// Make a row
 				.append('div')
-					.classed('row', true)
-				.append('div')
-					.classed({ 'small-centered': true, 'small-11': true, 'columns': true })
-				.call(function (query) {
+					.classed({ 'panel': true, 'panel-default': true })
+				.each(function () {
 					// Display information about query.
-					query.append('h3')
+					d3.select(this)
+						.append('div').classed('panel-heading', true)
+						.append('h3').classed('panel-title', true)
 						.text(function (d) { return d.title; })
-					query.append('p')
+					d3.select(this).append('panel-body')
 						.text(function (d) { return d.description; })
 				})
 				.each(function (d) {
+					var group = d3.select(this);
+					group.append('br');
 					// Build buttons
-					d3.select(this).call(buildButton, 'fi-eye', 'View', '#/query/' + d._id);
-					d3.select(this).call(buildButton, 'fi-heart', 'Favourite', function () {
+					group.call(buildButton, 'fa-eye', 'View', '#/query/' + d._id);
+					group.call(buildButton, 'fa-heart', 'Favourite', function () {
 						alert("Favourite not implemented yet");
 					});
 				});
@@ -53,29 +59,31 @@ function Visualizer() {
 		this.clean();
 		d3.json(document.api.query(id), function displayQuery(error, data) {
 			if (error) { throw "Query failed to be requested."; }
-			// Set title.
-			title.text(data.title);
-			var container = main.append('div').classed('row', true)
+			
+			main.append('h1').text(data.title);
+			
+			var row = main.append('div').classed('row', true)
 				.append('div')
 				.classed({ 'small-centered': true, 'small-11': true, 'columns': true });
 			
 			// Build the chart.
-			container.append('div').attr('id', 'chart');
+			row.append('div').classed({ 'panel': true, 'panel-default': true })
+				.append('div').attr('id', 'chart');
 			data.chart.bindto = '#chart';
 			var chart = c3.generate(data.chart);
 			
 			// Set controls.
-			var controls = container.append('div').attr('id', 'controls').call(function (controls) {
+			var controls = row.append('div').attr('id', 'controls').call(function (controls) {
 				buildControls(chart, controls);
 			});
 			
 			// Set description.
-			container.append('h4').text('Description:')
-			container.append('p').attr('id', 'description').classed('panel', true)
+			row.append('h4').text('Description:')
+			row.append('p').attr('id', 'description').classed('panel', true)
 				.text(data.description);
 			
 			// Some info
-			container.append('p').attr('id', 'details').call(function (details) {
+			row.append('p').attr('id', 'details').call(function (details) {
 				// Author
 				details.append('b').text('Author: ')
 				details.append('span').attr('id', 'author')
@@ -98,20 +106,17 @@ function Visualizer() {
 	 * @param {Element} controls - The DOM element to append the controls too.
 	 */
 	function buildControls(chart, controls) {
-		document.chart = chart;
-		var defaults = $.extend({}, chart.data.colors()),
-			changeColumnColour = function () {
-				var column = $(this).data('column'),
-					colour = $(this).val(),
-					current = chart.data.colors();
-				current[column] = colour;
-				chart.data.colors(current);
-			}; // We use this to apply the function in the event calls.
-		
+		var columns = _.pluck(chart.data.targets, 'id');
+		function changeColumnColour() {
+			var column = $(this).data('column'),
+				colour = $(this).val(),
+				current = chart.data.colors();
+			current[column] = colour;
+			chart.data.colors(current);
+		}
 		var colours = controls.append('div').attr('id', 'colours');
-		Object.keys(chart.data.colors()).forEach(function (key) {
+		columns.forEach(function (key) {
 			var label = colours.append('label').classed();
-			
 			label.append('input').attr('type', 'color')
 				.attr('data-column', key)
 				.property('value', chart.data.colors()[key])
@@ -122,14 +127,17 @@ function Visualizer() {
 	
 	/** Generates a button (actually an 'a') as a child of the selection.
 	 * @param {Element} selection - The DOM element to append to.
-	 * @param {string} icon - An icon selected from Foundation Icons.
+	 * @param {string} icon - An icon selected from Font-Awesome Icons.
 	 * @param {string} title - The text inside of the button.
 	 * @param {string|function} action - Either a link target or a function to be executed on click.
 	 */
 	function buildButton(selection, icon, title, action) {
-		var button = selection.append('a').classed({ 'button': true, 'small': true })
+		var button = selection.append('a').classed({ 'btn': true, 'btn-default': true, 'btn-labeled': true })
 			.call(function (button) {
-				button.append('i').classed(icon, true);
+				button.append('span').classed('btn-label', true)
+					.append('i')
+					.classed('fa', true)
+					.classed(icon, true);
 				button.append('span').text(' ' + title);
 			});
 			if (typeof action === "function") {

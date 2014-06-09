@@ -6,6 +6,11 @@ function Router() {
 	// Routie http://projects.jga.me/routie/
 	// Use Anonymouse functions to avoid needing to use .bind()
 	
+	/** Display home */
+	routie('/', function () {
+		document.visualizer.home();
+	});
+	
 	/** Get a list of queries. */
 	routie('/queries', function () {
 		document.visualizer.queries();
