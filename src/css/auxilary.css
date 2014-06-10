@@ -40,3 +40,7 @@ body {
 .navmenu-header:focus {
 	text-decoration: none;
 }
+
+.darkened {
+	background: #444444;
+}

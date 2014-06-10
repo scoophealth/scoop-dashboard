@@ -1,23 +1,36 @@
 {
 	"_id": "3",
-	"title": "How much people like pie charts.",
-	"description": "This is an extremely scientific chart about how much people like pie charts.",
+	"title": "TEST-001",
+	"description": "A test chart.",
 	"map": "...",
 	"filter": "...",
 	"reduce": "...",
 	"author": "hub user <hubuser.example.com>",
 	"date": "June 31st, 2012",
-	"chart": {
-		"data": {
-			"columns": [
-				["Morgan", 95],
-				["Anita", 1],
-				["Jens", 1],
-				["Jeremy", 1],
-				["Raymond", 1],
-				["Others", 1]
-			],
-			"type": "pie"
+	"charts": [
+		{
+			"data": {
+				"x": "x",
+				"json": {
+					"x": [ "2014-05-01", "2014-05-07", "2014-05-14", "2014-05-21", "2014-05-28", "2014-06-04" ],
+					"Exploration": [ 100, 70, 40, 30, 20, 10 ],
+					"Architecting": [ 0, 30, 30, 15, 15 , 15 ],
+					"Coding": [ 0, 0, 30, 55, 65, 75 ]
+				}
+			},
+			"axis": {
+				"x": {
+					"type": "timeseries",
+					"tick": {
+						"format": "%Y-%m-%d"
+					}
+				}
+			},
+			"regions": [
+				{"axis": "x", "end": "2014-05-07", "class": "darkened" },
+				{"axis": "x", "start": "2014-05-14", "end": "2014-05-21", "class": "darkened" },
+				{"axis": "x", "start": "2014-05-28", "end": "2014-06-04", "class": "darkened" }
+			]
 		}
-	}
+	]
 }

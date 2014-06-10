@@ -35,8 +35,8 @@ casper.test.begin('/#/query/1', function suite(test) {
 	casper.evaluate(function () {
 		window.location.hash = '#/query/1';
 	});
-	casper.waitForSelector('#chart', function () {
-		test.assertExists('#chart', 'Place for chart.');
+	casper.waitForSelector('#displayArea', function () {
+		test.assertExists('#displayArea', 'Place for charts.');
 	});
 	casper.run(function () {
 		test.done();

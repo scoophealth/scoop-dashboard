@@ -59,19 +59,13 @@ function Visualizer() {
 		this.clean();
 		d3.json(document.api.query(id), function displayQuery(error, data) {
 			if (error) { throw error; }
+			var charts = [];
 			main.append('h1').text(data.title);
 			var row = main.append('div').classed('row', true)
-				.append('div')
-			// Build the chart.
-			row.append('div').classed({ 'panel': true, 'panel-default': true })
-				.append('div').attr('id', 'chart');
-			data.chart.bindto = '#chart';
-			var chart = c3.generate(data.chart);
-			
-			// TODO
-			document.chart = chart;
-			console.log(chart);
-			// TODO
+				.append('div');
+			// Build the chart space.
+			var displayArea = row.append('div').classed({ 'panel': true, 'panel-default': true })
+				.append('div').attr('id', 'displayArea');
 			
 			// Set tabs.
 			var tabControls = row.append('ul').classed({ 'nav': true, 'nav-tabs': true, 'nav-justified': true }).call(function (list) {
@@ -105,9 +99,19 @@ function Visualizer() {
 				})
 			});
 			
+			// Make chart
+			data.charts.map(function (chart, index) {
+				var width = (chart.width) ? chart.width : 100
+				displayArea.append('div').attr('id', "chart-" + index).attr('style', 'width: ' + width + '%; display: inline-block');
+				chart.bindto = '#chart-' + index;
+				charts.push(c3.generate(chart));
+			})
 			// Controls
 			var controls = tabContent.append('form').classed({ 'tab-pane': true, 'fade': true, 'form-horizontal': true }).attr('id', 'controls').call(function (controls) {
-				buildControls(chart, controls);
+				charts.map(function (chart) {
+					buildControls(chart, controls);
+					controls.append('div').classed('row', true);
+				});
 			});
 		});
 	};
@@ -131,7 +135,7 @@ function Visualizer() {
 		}
 		var colours = controls.append('div').attr('id', 'colours');
 		columns.forEach(function (key) {
-			var group = controls.append('div').classed({ 'form-group': true, 'col-xs-2': true });
+			var group = colours.append('div').classed({ 'form-group': true, 'col-xs-2': true });
 			var label = group.append('label')
 			label.append('span').text(' ' + key);
 			group.append('input')

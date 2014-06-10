@@ -1,36 +1,96 @@
 {
 	"_id": "1",
-	"title": "PDC-001",
-	"description": "This is a long description. This is a long description. This is a long description. This is a long description. This is a long description. This is a long description.",
+	"title": "PITO Problem List",
+	"description": "Showing uncoded and coded problem list as per PITO V7/V8",
 	"map": "...",
 	"filter": "...",
 	"reduce": "...",
 	"author": "hub user <hubuser.example.com>",
 	"date": "June 31st, 2012",
-	"chart": {
-		"data": {
-			"columns": [
-				["data1", 30, 200, 100, 400, 150, 250],
-				["data2", 50, 20, 10, 40, 15, 25]
-			],
-			"axes": {
-				"data2": "y2"
-			}
-		},
-		"axis": {
-			"y": {
-				"label": {
-					"text": "Y Label",
-					"position": "outer-middle"
-				}
+	"charts": [
+		{
+			"data": {
+				"json": {
+					"Uncoded": [4000],
+					"Not Coded": [3200],
+					"Coded": [4400]
+				},
+				"type": "donut"
 			},
-			"y2": {
-				"show": true,
-				"label": {
-					"text": "Y2 Label",
-					"position": "outer-middle"
-				}
-			}
+			"donut": {
+				"title": "Clinic A"
+			},
+			"width": 50
+		},
+		{
+			"data": {
+				"json": {
+					"Uncoded": [4000],
+					"Not Coded": [300],
+					"Coded": [0]
+				},
+				"type": "donut"
+			},
+			"donut": {
+				"title": "Clinic B"
+			},
+			"width": 50
+		},
+		{
+			"data": {
+				"json": {
+					"Uncoded": [3000],
+					"Not Coded": [0],
+					"Coded": [4900]
+				},
+				"type": "donut"
+			},
+			"donut": {
+				"title": "Clinic C"
+			},
+			"width": 50
+		},
+		{
+			"data": {
+				"json": {
+					"Uncoded": [3500],
+					"Not Coded": [0],
+					"Coded": [350]
+				},
+				"type": "donut"
+			},
+			"donut": {
+				"title": "Clinic D"
+			},
+			"width": 50
+		},
+		{
+			"data": {
+				"json": {
+					"Uncoded": [700],
+					"Not Coded": [0],
+					"Coded": [780]
+				},
+				"type": "donut"
+			},
+			"donut": {
+				"title": "Clinic E"
+			},
+			"width": 50
+		},
+		{
+			"data": {
+				"json": {
+					"Uncoded": [5000],
+					"Not Coded": [5500],
+					"Coded": [1000]
+				},
+				"type": "donut"
+			},
+			"donut": {
+				"title": "Clinic F"
+			},
+			"width": 50
 		}
-	}
+	]
 }
